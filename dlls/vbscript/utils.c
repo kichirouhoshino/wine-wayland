@@ -106,20 +106,11 @@ static HRESULT WINAPI safearray_iter_IEnumVARIANT_Next(IEnumVARIANT *iface,
     if(!This->sa->cLocks)
         ERR("SAFEARRAY not locked\n");
 
-    if (This->sa->fFeatures & FADF_VARIANT)
-    {
-        v = (VARIANT*)(((BYTE*)This->sa->pvData) + This->i * This->sa->cbElements);
-        V_VT(rgVar) = VT_EMPTY;
-        hres = VariantCopy(rgVar, v);
-        if(FAILED(hres))
-            return hres;
-    }
-    else if (This->sa->fFeatures & FADF_BSTR)
-    {
-        BSTR bstr  = *(BSTR*)(((BYTE*)This->sa->pvData) + This->i * This->sa->cbElements);
-        V_VT(rgVar) = VT_BSTR;
-        V_BSTR(rgVar) = SysAllocString(bstr);
-    }
+    v = (VARIANT*)(((BYTE*)This->sa->pvData) + This->i * This->sa->cbElements);
+    V_VT(rgVar) = VT_EMPTY;
+    hres = VariantCopy(rgVar, v);
+    if(FAILED(hres))
+        return hres;
 
     This->i++;
     if(pCeltFetched)
@@ -173,6 +164,11 @@ HRESULT create_safearray_iter(SAFEARRAY *sa, IEnumVARIANT **ev)
 {
     safearray_iter *iter;
     HRESULT hres;
+
+    if(sa && !(sa->fFeatures & FADF_VARIANT)) {
+        FIXME("enumeration not supported: %x\n", sa->fFeatures);
+        return E_NOTIMPL;
+    }
 
     iter = malloc(sizeof(*iter));
     if(!iter)

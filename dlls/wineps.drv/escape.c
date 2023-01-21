@@ -132,27 +132,12 @@ INT CDECL PSDRV_ExtEscape( PHYSDEV dev, INT nEscape, INT cbInput, LPCVOID in_dat
         return 1;
 
     case GETFACENAME:
-        if (physDev->font.fontloc == Download)
-        {
-            char *name = PSDRV_get_download_name(dev, physDev->font.set);
-            if (name)
-            {
-                TRACE("font name: %s\n", debugstr_a(name));
-                lstrcpynA(out_data, name, cbOutput);
-                HeapFree(GetProcessHeap(), 0, name);
-            }
-            else
-                lstrcpynA(out_data, "Courier", cbOutput);
-        }
-        else
-        {
-            TRACE("font name: %s\n", debugstr_a(physDev->font.fontinfo.Builtin.afm->FontName));
-            lstrcpynA(out_data, physDev->font.fontinfo.Builtin.afm->FontName, cbOutput);
-        }
+        FIXME("GETFACENAME: stub\n");
+        lstrcpynA(out_data, "Courier", cbOutput);
         return 1;
 
     case DOWNLOADFACE:
-        PSDRV_SetFont(dev, physDev->font.set);
+        FIXME("DOWNLOADFACE: stub\n");
         return 1;
 
     case MFCOMMENT:

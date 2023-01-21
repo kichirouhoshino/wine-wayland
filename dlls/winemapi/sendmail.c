@@ -34,8 +34,6 @@
 #include "winternl.h"
 #include "wine/debug.h"
 
-#include "winemapi_private.h"
-
 WINE_DEFAULT_DEBUG_CHANNEL(winemapi);
 
 /* Escapes a string for use in mailto: URL */
@@ -70,12 +68,23 @@ static char *escape_string(char *in, char *empty_string)
 }
 
 /**************************************************************************
- *  BrowserSendMail
+ *  MAPISendMail
  *
- * Send an email by forming a mailto uri and invoking a browser.
+ * Send a message using a native mail client.
+ *
+ * PARAMS
+ *  session  [I] Handle to a MAPI session.
+ *  uiparam  [I] Parent window handle.
+ *  message  [I] Pointer to a MAPIMessage structure.
+ *  flags    [I] Flags.
+ *  reserved [I] Reserved, pass 0.
+ *
+ * RETURNS
+ *  Success: SUCCESS_SUCCESS
+ *  Failure: MAPI_E_FAILURE
  *
  */
-static ULONG BrowserSendMail(LHANDLE session, ULONG_PTR uiparam,
+ULONG WINAPI MAPISendMail(LHANDLE session, ULONG_PTR uiparam,
     lpMapiMessage message, FLAGS flags, ULONG reserved)
 {
     ULONG ret = MAPI_E_FAILURE;
@@ -278,35 +287,6 @@ exit:
         HeapFree(GetProcessHeap(), 0, body);
 
     return ret;
-}
-
-/**************************************************************************
- *  MAPISendMail
- *
- * Send a message using a native mail client.
- *
- * PARAMS
- *  session  [I] Handle to a MAPI session.
- *  uiparam  [I] Parent window handle.
- *  message  [I] Pointer to a MAPIMessage structure.
- *  flags    [I] Flags.
- *  reserved [I] Reserved, pass 0.
- *
- * RETURNS
- *  Success: SUCCESS_SUCCESS
- *  Failure: MAPI_E_FAILURE
- *
- */
-ULONG WINAPI MAPISendMail(LHANDLE session, ULONG_PTR uiparam,
-    lpMapiMessage message, FLAGS flags, ULONG reserved)
-{
-    TRACE("(0x%I64xx 0x%I64xx %p 0x%08x 0x%08lx)\n", session, uiparam,
-           message, flags, reserved);
-
-    if (XDGMailAvailable())
-        return XDGSendMail(session, uiparam, message, flags, reserved);
-
-    return BrowserSendMail(session, uiparam, message, flags, reserved);
 }
 
 ULONG WINAPI MAPISendDocuments(ULONG_PTR uiparam, LPSTR delim, LPSTR paths,

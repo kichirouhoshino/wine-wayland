@@ -43,11 +43,9 @@
 #include "wine/vulkan_driver.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
-WINE_DECLARE_DEBUG_CHANNEL(fps);
 
-#ifndef SONAME_LIBVULKAN
-#define SONAME_LIBVULKAN ""
-#endif
+#ifdef SONAME_LIBVULKAN
+WINE_DECLARE_DEBUG_CHANNEL(fps);
 
 static pthread_mutex_t vulkan_mutex;
 
@@ -109,22 +107,13 @@ static void *vulkan_handle;
 
 static void wine_vk_init(void)
 {
-    const char *libvulkan_candidates[] = {SONAME_LIBVULKAN,
-                                          "libvulkan.so.1",
-                                          "libvulkan.so",
-                                          NULL};
-    int i;
+    init_recursive_mutex(&vulkan_mutex);
 
-    for (i=0; libvulkan_candidates[i] && !vulkan_handle; i++)
-        vulkan_handle = dlopen(libvulkan_candidates[i], RTLD_NOW);
-
-    if (!vulkan_handle)
+    if (!(vulkan_handle = dlopen(SONAME_LIBVULKAN, RTLD_NOW)))
     {
-        ERR("Failed to load vulkan library\n");
+        ERR("Failed to load %s.\n", SONAME_LIBVULKAN);
         return;
     }
-
-    init_recursive_mutex(&vulkan_mutex);
 
 #define LOAD_FUNCPTR(f) if (!(p##f = dlsym(vulkan_handle, #f))) goto fail
 #define LOAD_OPTIONAL_FUNCPTR(f) p##f = dlsym(vulkan_handle, #f)
@@ -745,3 +734,20 @@ const struct vulkan_funcs *get_vulkan_driver(UINT version)
     return NULL;
 }
 
+#else /* No vulkan */
+
+const struct vulkan_funcs *get_vulkan_driver(UINT version)
+{
+    ERR("Wine was built without Vulkan support.\n");
+    return NULL;
+}
+
+void wine_vk_surface_destroy(HWND hwnd)
+{
+}
+
+void vulkan_thread_detach(void)
+{
+}
+
+#endif /* SONAME_LIBVULKAN */

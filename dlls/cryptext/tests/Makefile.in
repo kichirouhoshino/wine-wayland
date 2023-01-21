@@ -1,4 +1,0 @@
-TESTDLL = cryptext.dll
-
-C_SRCS = \
-	cryptext.c

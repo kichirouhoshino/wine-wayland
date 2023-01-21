@@ -316,12 +316,7 @@ void write_typelib_regscript( const statement_list_t *stmts )
         if (count && !strendswith( typelib_name, ".res" ))
             error( "Cannot store multiple typelibs into %s\n", typelib_name );
         else
-        {
-            if (do_old_typelib)
-                create_sltg_typelib( stmt->u.lib );
-            else
-                create_msft_typelib( stmt->u.lib );
-        }
+            create_msft_typelib( stmt->u.lib );
         count++;
     }
     if (count && strendswith( typelib_name, ".res" )) flush_output_resources( typelib_name );

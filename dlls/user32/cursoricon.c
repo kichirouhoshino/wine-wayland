@@ -1376,12 +1376,7 @@ static HICON CURSORICON_Load(HINSTANCE hInstance, LPCWSTR name,
           hInstance, debugstr_w(name), width, height, depth, fCursor, loadflags);
 
     if ( loadflags & LR_LOADFROMFILE )    /* Load from file */
-    {
-        if (IS_INTRESOURCE(name) && GetProcessVersion(0) < 0x40000)
-            WARN("Windows 3.1 app set LR_LOADFROMFILE without a name, fallback to loading from resource\n");
-        else
-            return CURSORICON_LoadFromFile( name, width, height, depth, fCursor, loadflags );
-    }
+        return CURSORICON_LoadFromFile( name, width, height, depth, fCursor, loadflags );
 
     if (!hInstance) hInstance = user32_module;  /* Load OEM cursor/icon */
 

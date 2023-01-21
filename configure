@@ -1131,8 +1131,6 @@ enable_dwrite
 enable_dx8vb
 enable_dxdiagn
 enable_dxgi
-enable_dxgkrnl_sys
-enable_dxgmms1_sys
 enable_dxtrans
 enable_dxva2
 enable_esent
@@ -1456,7 +1454,6 @@ enable_wevtapi
 enable_wevtsvc
 enable_wiaservc
 enable_wimgapi
-enable_win32k_sys
 enable_win32u
 enable_windows_devices_enumeration
 enable_windows_gaming_input
@@ -1466,7 +1463,6 @@ enable_windows_media_devices
 enable_windows_media_speech
 enable_windows_media
 enable_windows_networking
-enable_windows_networking_connectivity
 enable_windowscodecs
 enable_windowscodecsext
 enable_winealsa_drv
@@ -7986,12 +7982,6 @@ then :
   printf "%s\n" "#define HAVE_LINUX_PARAM_H 1" >>confdefs.h
 
 fi
-ac_fn_c_check_header_compile "$LINENO" "linux/seccomp.h" "ac_cv_header_linux_seccomp_h" "$ac_includes_default"
-if test "x$ac_cv_header_linux_seccomp_h" = xyes
-then :
-  printf "%s\n" "#define HAVE_LINUX_SECCOMP_H 1" >>confdefs.h
-
-fi
 ac_fn_c_check_header_compile "$LINENO" "linux/serial.h" "ac_cv_header_linux_serial_h" "$ac_includes_default"
 if test "x$ac_cv_header_linux_serial_h" = xyes
 then :
@@ -8158,12 +8148,6 @@ ac_fn_c_check_header_compile "$LINENO" "sys/event.h" "ac_cv_header_sys_event_h" 
 if test "x$ac_cv_header_sys_event_h" = xyes
 then :
   printf "%s\n" "#define HAVE_SYS_EVENT_H 1" >>confdefs.h
-
-fi
-ac_fn_c_check_header_compile "$LINENO" "sys/eventfd.h" "ac_cv_header_sys_eventfd_h" "$ac_includes_default"
-if test "x$ac_cv_header_sys_eventfd_h" = xyes
-then :
-  printf "%s\n" "#define HAVE_SYS_EVENTFD_H 1" >>confdefs.h
 
 fi
 ac_fn_c_check_header_compile "$LINENO" "sys/extattr.h" "ac_cv_header_sys_extattr_h" "$ac_includes_default"
@@ -15718,12 +15702,11 @@ fi
 
 if test "x$with_wayland" = "xyes"
 then
-    rm -f conftest.err
-if ${WAYLAND_CLIENT_CFLAGS:+false} :
+    if ${WAYLAND_CLIENT_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  WAYLAND_CLIENT_CFLAGS=`$PKG_CONFIG --cflags wayland-client 2>conftest.err`
+  WAYLAND_CLIENT_CFLAGS=`$PKG_CONFIG --cflags wayland-client 2>/dev/null`
 fi
 fi
 
@@ -15738,11 +15721,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-client cflags: $WAYLAND_CLIENT_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-client libs: $WAYLAND_CLIENT_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: wayland-client errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $WAYLAND_CLIENT_CFLAGS"
 ac_fn_c_check_header_compile "$LINENO" "wayland-client.h" "ac_cv_header_wayland_client_h" "$ac_includes_default"
@@ -15796,12 +15774,11 @@ fi
 
 CPPFLAGS=$ac_save_CPPFLAGS
 
-    rm -f conftest.err
-if ${WAYLAND_PROTOCOLS_CFLAGS:+false} :
+    if ${WAYLAND_PROTOCOLS_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  WAYLAND_PROTOCOLS_CFLAGS=`$PKG_CONFIG --cflags wayland-protocols 2>conftest.err`
+  WAYLAND_PROTOCOLS_CFLAGS=`$PKG_CONFIG --cflags wayland-protocols 2>/dev/null`
 fi
 fi
 
@@ -15816,11 +15793,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-protocols cflags: $WAYLAND_PROTOCOLS_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-protocols libs: $WAYLAND_PROTOCOLS_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: wayland-protocols errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $WAYLAND_PROTOCOLS_CFLAGS"
 WAYLAND_PROTOCOLS_DATADIR=`$PKG_CONFIG --atleast-version=1.14 wayland-protocols && $PKG_CONFIG --variable=pkgdatadir wayland-protocols`
@@ -15873,12 +15845,11 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-    rm -f conftest.err
-if ${WAYLAND_CURSOR_CFLAGS:+false} :
+    if ${WAYLAND_CURSOR_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  WAYLAND_CURSOR_CFLAGS=`$PKG_CONFIG --cflags wayland-cursor 2>conftest.err`
+  WAYLAND_CURSOR_CFLAGS=`$PKG_CONFIG --cflags wayland-cursor 2>/dev/null`
 fi
 fi
 
@@ -15893,11 +15864,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-cursor cflags: $WAYLAND_CURSOR_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: wayland-cursor libs: $WAYLAND_CURSOR_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: wayland-cursor errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $WAYLAND_CURSOR_CFLAGS"
 ac_fn_c_check_header_compile "$LINENO" "wayland-cursor.h" "ac_cv_header_wayland_cursor_h" "$ac_includes_default"
@@ -15951,12 +15917,11 @@ fi
 
 CPPFLAGS=$ac_save_CPPFLAGS
 
-    rm -f conftest.err
-if ${XKBCOMMON_CFLAGS:+false} :
+    if ${XKBCOMMON_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  XKBCOMMON_CFLAGS=`$PKG_CONFIG --cflags xkbcommon 2>conftest.err`
+  XKBCOMMON_CFLAGS=`$PKG_CONFIG --cflags xkbcommon 2>/dev/null`
 fi
 fi
 
@@ -15971,11 +15936,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: xkbcommon cflags: $XKBCOMMON_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: xkbcommon libs: $XKBCOMMON_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: xkbcommon errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $XKBCOMMON_CFLAGS"
 ac_fn_c_check_header_compile "$LINENO" "xkbcommon/xkbcommon.h" "ac_cv_header_xkbcommon_xkbcommon_h" "$ac_includes_default"
@@ -16029,12 +15989,11 @@ fi
 
 CPPFLAGS=$ac_save_CPPFLAGS
 
-    rm -f conftest.err
-if ${GBM_CFLAGS:+false} :
+    if ${GBM_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  GBM_CFLAGS=`$PKG_CONFIG --cflags gbm 2>conftest.err`
+  GBM_CFLAGS=`$PKG_CONFIG --cflags gbm 2>/dev/null`
 fi
 fi
 
@@ -16049,11 +16008,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: gbm cflags: $GBM_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: gbm libs: $GBM_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: gbm errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $GBM_CFLAGS"
 ac_fn_c_check_header_compile "$LINENO" "gbm.h" "ac_cv_header_gbm_h" "$ac_includes_default"
@@ -16117,12 +16071,11 @@ fi
 LIBS="$ac_wine_check_funcs_save_LIBS"
 CPPFLAGS=$ac_save_CPPFLAGS
 
-    rm -f conftest.err
-if ${DRM_CFLAGS:+false} :
+    if ${DRM_CFLAGS:+false} :
 then :
   if test ${PKG_CONFIG+y}
 then :
-  DRM_CFLAGS=`$PKG_CONFIG --cflags libdrm 2>conftest.err`
+  DRM_CFLAGS=`$PKG_CONFIG --cflags libdrm 2>/dev/null`
 fi
 fi
 
@@ -16137,11 +16090,6 @@ fi
 
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: libdrm cflags: $DRM_CFLAGS" >&5
 printf "%s\n" "$as_me:${as_lineno-$LINENO}: libdrm libs: $DRM_LIBS" >&5
-if test -s conftest.err; then
-     printf %s "$as_me:${as_lineno-$LINENO}: libdrm errors: " >&5
-     cat conftest.err >&5
-fi
-rm -f conftest.err
 ac_save_CPPFLAGS=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $DRM_CFLAGS"
 ac_fn_c_check_header_compile "$LINENO" "drm.h" "ac_cv_header_drm_h" "$ac_includes_default"
@@ -20601,12 +20549,6 @@ then :
   printf "%s\n" "#define HAVE_POSIX_FALLOCATE 1" >>confdefs.h
 
 fi
-ac_fn_c_check_func "$LINENO" "ppoll" "ac_cv_func_ppoll"
-if test "x$ac_cv_func_ppoll" = xyes
-then :
-  printf "%s\n" "#define HAVE_PPOLL 1" >>confdefs.h
-
-fi
 ac_fn_c_check_func "$LINENO" "prctl" "ac_cv_func_prctl"
 if test "x$ac_cv_func_prctl" = xyes
 then :
@@ -20623,18 +20565,6 @@ ac_fn_c_check_func "$LINENO" "sched_yield" "ac_cv_func_sched_yield"
 if test "x$ac_cv_func_sched_yield" = xyes
 then :
   printf "%s\n" "#define HAVE_SCHED_YIELD 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "renameat" "ac_cv_func_renameat"
-if test "x$ac_cv_func_renameat" = xyes
-then :
-  printf "%s\n" "#define HAVE_RENAMEAT 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "renameat2" "ac_cv_func_renameat2"
-if test "x$ac_cv_func_renameat2" = xyes
-then :
-  printf "%s\n" "#define HAVE_RENAMEAT2 1" >>confdefs.h
 
 fi
 ac_fn_c_check_func "$LINENO" "setproctitle" "ac_cv_func_setproctitle"
@@ -20745,72 +20675,6 @@ fi
     LIBS=$ac_save_LIBS
     ;;
 esac
-
-ac_save_LIBS=$LIBS
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing shm_open" >&5
-printf %s "checking for library containing shm_open... " >&6; }
-if test ${ac_cv_search_shm_open+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char shm_open ();
-int
-main (void)
-{
-return shm_open ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' rt
-do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_search_shm_open=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext
-  if test ${ac_cv_search_shm_open+y}
-then :
-  break
-fi
-done
-if test ${ac_cv_search_shm_open+y}
-then :
-
-else $as_nop
-  ac_cv_search_shm_open=no
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_shm_open" >&5
-printf "%s\n" "$ac_cv_search_shm_open" >&6; }
-ac_res=$ac_cv_search_shm_open
-if test "$ac_res" != no
-then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-
-printf "%s\n" "#define HAVE_SHM_OPEN 1" >>confdefs.h
-
-                test "$ac_res" = "none required" || RT_LIBS="$ac_res"
-
-fi
-
-LIBS=$ac_save_LIBS
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sched_setaffinity" >&5
 printf %s "checking for sched_setaffinity... " >&6; }
@@ -21897,7 +21761,6 @@ wine_fn_config_makefile dlls/crypt32/tests enable_tests
 wine_fn_config_makefile dlls/cryptdlg enable_cryptdlg
 wine_fn_config_makefile dlls/cryptdll enable_cryptdll
 wine_fn_config_makefile dlls/cryptext enable_cryptext
-wine_fn_config_makefile dlls/cryptext/tests enable_tests
 wine_fn_config_makefile dlls/cryptnet enable_cryptnet
 wine_fn_config_makefile dlls/cryptnet/tests enable_tests
 wine_fn_config_makefile dlls/cryptowinrt enable_cryptowinrt
@@ -22073,8 +21936,6 @@ wine_fn_config_makefile dlls/dxdiagn enable_dxdiagn
 wine_fn_config_makefile dlls/dxdiagn/tests enable_tests
 wine_fn_config_makefile dlls/dxgi enable_dxgi
 wine_fn_config_makefile dlls/dxgi/tests enable_tests
-wine_fn_config_makefile dlls/dxgkrnl.sys enable_dxgkrnl_sys
-wine_fn_config_makefile dlls/dxgmms1.sys enable_dxgmms1_sys
 wine_fn_config_makefile dlls/dxtrans enable_dxtrans
 wine_fn_config_makefile dlls/dxva2 enable_dxva2
 wine_fn_config_makefile dlls/dxva2/tests enable_tests
@@ -22592,7 +22453,6 @@ wine_fn_config_makefile dlls/wevtsvc enable_wevtsvc
 wine_fn_config_makefile dlls/wiaservc enable_wiaservc
 wine_fn_config_makefile dlls/wiaservc/tests enable_tests
 wine_fn_config_makefile dlls/wimgapi enable_wimgapi
-wine_fn_config_makefile dlls/win32k.sys enable_win32k_sys
 wine_fn_config_makefile dlls/win32s16.dll16 enable_win16
 wine_fn_config_makefile dlls/win32u enable_win32u
 wine_fn_config_makefile dlls/win32u/tests enable_tests
@@ -22614,7 +22474,6 @@ wine_fn_config_makefile dlls/windows.media.speech/tests enable_tests
 wine_fn_config_makefile dlls/windows.media enable_windows_media
 wine_fn_config_makefile dlls/windows.media/tests enable_tests
 wine_fn_config_makefile dlls/windows.networking enable_windows_networking
-wine_fn_config_makefile dlls/windows.networking.connectivity enable_windows_networking_connectivity
 wine_fn_config_makefile dlls/windowscodecs enable_windowscodecs
 wine_fn_config_makefile dlls/windowscodecs/tests enable_tests
 wine_fn_config_makefile dlls/windowscodecsext enable_windowscodecsext
@@ -23028,7 +22887,7 @@ maintainer-clean::
 
 as_fn_append wine_rules "
 dlls/ntdll/unix/version.c: dummy
-	@version=\`(GIT_DIR=${wine_srcdir}.git git describe HEAD 2>/dev/null || echo \"wine-\$(PACKAGE_VERSION)\") | sed -n -e '\$\$s/\(.*\)/const char wine_build[] = \"\\1 (Staging)\";/p'\` && (echo \$\$version | cmp -s - \$@) || echo \$\$version >\$@ || (rm -f \$@ && exit 1)
+	@version=\`(GIT_DIR=${wine_srcdir}.git git describe HEAD 2>/dev/null || echo \"wine-\$(PACKAGE_VERSION)\") | sed -n -e '\$\$s/\(.*\)/const char wine_build[] = \"\\1\";/p'\` && (echo \$\$version | cmp -s - \$@) || echo \$\$version >\$@ || (rm -f \$@ && exit 1)
 programs/winetest/build.rc: dummy
 	@build=\"STRINGTABLE { 1 \\\"\`GIT_DIR=${wine_srcdir}.git git rev-parse HEAD 2>/dev/null\`\\\" }\" && (echo \$\$build | cmp -s - \$@) || echo \$\$build >\$@ || (rm -f \$@ && exit 1)
 programs/winetest/build.nfo:

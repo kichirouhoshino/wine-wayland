@@ -1566,7 +1566,7 @@ static BOOL process_mouse_message( MSG *msg, UINT hw_id, ULONG_PTR extra_info, H
     {
         HWND orig = msg->hwnd;
 
-        msg->hwnd = window_from_point( 0, msg->pt, &hittest );
+        msg->hwnd = window_from_point( msg->hwnd, msg->pt, &hittest );
         if (!msg->hwnd) /* As a heuristic, try the next window if it's the owner of orig */
         {
             HWND next = get_window_relative( orig, GW_HWNDNEXT );
@@ -2623,7 +2623,6 @@ NTSTATUS send_hardware_message( HWND hwnd, const INPUT *input, const RAWINPUT *r
             req->input.mouse.flags = input->mi.dwFlags;
             req->input.mouse.time  = input->mi.time;
             req->input.mouse.info  = input->mi.dwExtraInfo;
-            if (rawinput) req->flags |= SEND_HWMSG_RAWINPUT;
             break;
         case INPUT_KEYBOARD:
             req->input.kbd.vkey  = input->ki.wVk;
@@ -2631,7 +2630,6 @@ NTSTATUS send_hardware_message( HWND hwnd, const INPUT *input, const RAWINPUT *r
             req->input.kbd.flags = input->ki.dwFlags;
             req->input.kbd.time  = input->ki.time;
             req->input.kbd.info  = input->ki.dwExtraInfo;
-            if (rawinput) req->flags |= SEND_HWMSG_RAWINPUT;
             break;
         case INPUT_HARDWARE:
             req->input.hw.msg    = input->hi.uMsg;
@@ -2643,12 +2641,6 @@ NTSTATUS send_hardware_message( HWND hwnd, const INPUT *input, const RAWINPUT *r
                 req->input.hw.rawinput.type = rawinput->header.dwType;
                 switch (rawinput->header.dwType)
                 {
-                case RIM_TYPEMOUSE:
-                    req->input.hw.rawinput.mouse.x = rawinput->data.mouse.lLastX;
-                    req->input.hw.rawinput.mouse.y = rawinput->data.mouse.lLastY;
-                    req->input.hw.rawinput.mouse.data = rawinput->data.mouse.ulRawButtons;
-                    req->input.hw.lparam = rawinput->data.mouse.usFlags;
-                    break;
                 case RIM_TYPEHID:
                     req->input.hw.rawinput.hid.device = HandleToUlong( rawinput->header.hDevice );
                     req->input.hw.rawinput.hid.param = rawinput->header.wParam;
@@ -3190,7 +3182,7 @@ UINT_PTR WINAPI NtUserSetTimer( HWND hwnd, UINT_PTR id, UINT timeout, TIMERPROC 
 
     if (proc) winproc = alloc_winproc( (WNDPROC)proc, TRUE );
 
-    timeout = min( max( 5, timeout ), USER_TIMER_MAXIMUM );
+    timeout = min( max( USER_TIMER_MINIMUM, timeout ), USER_TIMER_MAXIMUM );
 
     SERVER_START_REQ( set_win_timer )
     {

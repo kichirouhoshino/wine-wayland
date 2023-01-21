@@ -255,8 +255,6 @@ LPVOID WINAPI DECLSPEC_HOTPATCH MapViewOfFile3( HANDLE handle, HANDLE process, P
     LARGE_INTEGER off;
     void *addr;
 
-    if (!process) process = GetCurrentProcess();
-
     addr = baseaddr;
     off.QuadPart = offset;
     if (!set_ntstatus( NtMapViewOfSectionEx( handle, process, &addr, &off, &size, alloc_type, protection,
@@ -449,12 +447,6 @@ BOOL WINAPI DECLSPEC_HOTPATCH VirtualFree( void *addr, SIZE_T size, DWORD type )
  */
 BOOL WINAPI DECLSPEC_HOTPATCH VirtualFreeEx( HANDLE process, void *addr, SIZE_T size, DWORD type )
 {
-    if (type == MEM_RELEASE && size)
-    {
-        WARN( "Trying to release memory with specified size.\n" );
-        SetLastError( ERROR_INVALID_PARAMETER );
-        return FALSE;
-    }
     return set_ntstatus( NtFreeVirtualMemory( process, &addr, &size, type ));
 }
 

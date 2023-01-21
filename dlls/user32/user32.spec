@@ -503,7 +503,7 @@
 @ stdcall LoadImageA(long str long long long long)
 @ stdcall LoadImageW(long wstr long long long long)
 @ stdcall LoadKeyboardLayoutA(str long)
-@ stdcall LoadKeyboardLayoutEx(long wstr long)
+# @ stub LoadKeyboardLayoutEx
 @ stdcall LoadKeyboardLayoutW(wstr long)
 @ stdcall LoadLocalFonts()
 @ stdcall LoadMenuA(long str)

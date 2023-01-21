@@ -578,59 +578,6 @@ void wined3d_device_destroy_default_samplers(struct wined3d_device *device)
     device->null_sampler = NULL;
 }
 
-static GLuint64 create_dummy_sampler_handle(struct wined3d_device *device, struct wined3d_context_gl *context_gl,
-        GLuint texture)
-{
-    const struct wined3d_gl_info *gl_info = context_gl->gl_info;
-    GLuint64 handle;
-
-    handle = GL_EXTCALL(glGetTextureSamplerHandleARB(texture, wined3d_sampler_gl(device->default_sampler)->name));
-    GL_EXTCALL(glMakeTextureHandleResidentARB(handle));
-    checkGLcall("glMakeTextureHandleResidentARB");
-    return handle;
-}
-
-/* Context activation is done by the caller. */
-static void create_dummy_sampler_handles(struct wined3d_device *device, struct wined3d_context_gl *context_gl)
-{
-    const struct wined3d_gl_info *gl_info = context_gl->gl_info;
-    const struct wined3d_dummy_textures *textures = &wined3d_device_gl(device)->dummy_textures;
-    struct wined3d_dummy_sampler_handles *handles = &device->dummy_sampler_handles;
-
-    if (!gl_info->supported[ARB_BINDLESS_TEXTURE])
-        return;
-
-    if (gl_info->supported[ARB_TEXTURE_MULTISAMPLE])
-    {
-        handles->tex_2d_ms = create_dummy_sampler_handle(device, context_gl, textures->tex_2d_ms);
-        handles->tex_2d_ms_array = create_dummy_sampler_handle(device, context_gl, textures->tex_2d_ms_array);
-    }
-
-    if (gl_info->supported[ARB_TEXTURE_BUFFER_OBJECT])
-        handles->tex_buffer = create_dummy_sampler_handle(device, context_gl, textures->tex_buffer);
-
-    if (gl_info->supported[EXT_TEXTURE_ARRAY])
-    {
-        handles->tex_2d_array = create_dummy_sampler_handle(device, context_gl, textures->tex_2d_array);
-        handles->tex_1d_array = create_dummy_sampler_handle(device, context_gl, textures->tex_1d_array);
-    }
-
-    if (gl_info->supported[ARB_TEXTURE_CUBE_MAP_ARRAY])
-        handles->tex_cube_array = create_dummy_sampler_handle(device, context_gl, textures->tex_cube_array);
-
-    if (gl_info->supported[ARB_TEXTURE_CUBE_MAP])
-        handles->tex_cube = create_dummy_sampler_handle(device, context_gl, textures->tex_cube);
-
-    if (gl_info->supported[EXT_TEXTURE3D])
-        handles->tex_3d = create_dummy_sampler_handle(device, context_gl, textures->tex_3d);
-
-    if (gl_info->supported[ARB_TEXTURE_RECTANGLE])
-        handles->tex_rect = create_dummy_sampler_handle(device, context_gl, textures->tex_rect);
-
-    handles->tex_2d = create_dummy_sampler_handle(device, context_gl, textures->tex_2d);
-    handles->tex_1d = create_dummy_sampler_handle(device, context_gl, textures->tex_1d);
-}
-
 static bool wined3d_null_image_vk_init(struct wined3d_image_vk *image, struct wined3d_context_vk *context_vk,
         VkCommandBuffer vk_command_buffer, VkImageType type, unsigned int layer_count, unsigned int sample_count)
 {
@@ -1341,7 +1288,6 @@ void wined3d_device_gl_create_primary_opengl_context_cs(void *object)
 
     wined3d_device_gl_create_dummy_textures(device_gl, context_gl);
     wined3d_device_create_default_samplers(device, context);
-    create_dummy_sampler_handles(device, context_gl);
     context_release(context);
 }
 
@@ -1542,29 +1488,6 @@ UINT CDECL wined3d_device_get_available_texture_mem(const struct wined3d_device 
     TRACE("device %p.\n", device);
 
     driver_info = &device->adapter->driver_info;
-
-    /* We can not acquire the context unless there is a swapchain. */
-    /*
-    if (device->swapchains && gl_info->supported[NVX_GPU_MEMORY_INFO] &&
-            !wined3d_settings.emulated_textureram)
-    {
-        GLint vram_free_kb;
-        UINT64 vram_free;
-
-        struct wined3d_context *context = context_acquire(device, NULL, 0);
-        gl_info->gl_ops.gl.p_glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_free_kb);
-        vram_free = (UINT64)vram_free_kb * 1024;
-        context_release(context);
-
-        TRACE("Total 0x%s bytes. emulation 0x%s left, driver 0x%s left.\n",
-                wine_dbgstr_longlong(device->adapter->vram_bytes),
-                wine_dbgstr_longlong(device->adapter->vram_bytes - device->adapter->vram_bytes_used),
-                wine_dbgstr_longlong(vram_free));
-
-        vram_free = min(vram_free, device->adapter->vram_bytes - device->adapter->vram_bytes_used);
-        return min(UINT_MAX, vram_free);
-    }
-    */
 
     TRACE("Emulating 0x%s bytes. 0x%s used, returning 0x%s left.\n",
             wine_dbgstr_longlong(driver_info->vram_bytes),
@@ -3976,7 +3899,7 @@ void CDECL wined3d_device_apply_stateblock(struct wined3d_device *device,
     const struct wined3d_saved_states *changed = &stateblock->changed;
     const unsigned int word_bit_count = sizeof(DWORD) * CHAR_BIT;
     struct wined3d_device_context *context = &device->cs->c;
-    unsigned int i, j, start, idx, vs_uniform_count;
+    unsigned int i, j, start, idx;
     struct wined3d_range range;
     uint32_t map;
 
@@ -3987,11 +3910,9 @@ void CDECL wined3d_device_apply_stateblock(struct wined3d_device *device,
     if (changed->pixelShader)
         wined3d_device_context_set_shader(context, WINED3D_SHADER_TYPE_PIXEL, state->ps);
 
-    vs_uniform_count = wined3d_device_get_vs_uniform_count(device);
-
     for (start = 0; ; start = range.offset + range.size)
     {
-        if (!wined3d_bitmap_get_range(changed->vs_consts_f, vs_uniform_count, start, &range))
+        if (!wined3d_bitmap_get_range(changed->vs_consts_f, WINED3D_MAX_VS_CONSTS_F, start, &range))
             break;
 
         wined3d_device_set_vs_consts_f(device, range.offset, range.size, &state->vs_consts_f[range.offset]);
@@ -4372,22 +4293,9 @@ void CDECL wined3d_device_apply_stateblock(struct wined3d_device *device,
 
 HRESULT CDECL wined3d_device_get_device_caps(const struct wined3d_device *device, struct wined3d_caps *caps)
 {
-    struct wined3d_vertex_caps vertex_caps;
-    HRESULT hr;
-
     TRACE("device %p, caps %p.\n", device, caps);
 
-    if (FAILED(hr = wined3d_get_device_caps(device->adapter, device->create_parms.device_type, caps)))
-        return hr;
-
-    if (device->create_parms.flags & WINED3DCREATE_SOFTWARE_VERTEXPROCESSING)
-        caps->MaxVertexShaderConst = device->adapter->d3d_info.limits.vs_uniform_count_swvp;
-
-    device->adapter->vertex_pipe->vp_get_caps(device->adapter, &vertex_caps);
-    caps->MaxVertexBlendMatrixIndex = vertex_caps.max_vertex_blend_matrix_index;
-    if (!wined3d_device_is_swvp_mode(device))
-        caps->MaxVertexBlendMatrixIndex = min(caps->MaxVertexBlendMatrixIndex, 8);
-    return hr;
+    return wined3d_get_device_caps(device->adapter, device->create_parms.device_type, caps);
 }
 
 HRESULT CDECL wined3d_device_get_display_mode(const struct wined3d_device *device, UINT swapchain_idx,
@@ -4742,14 +4650,6 @@ void CDECL wined3d_device_set_software_vertex_processing(struct wined3d_device *
         warned = TRUE;
     }
 
-    wined3d_cs_finish(device->cs, WINED3D_CS_QUEUE_DEFAULT);
-    if (!device->softwareVertexProcessing != !software)
-    {
-        unsigned int i;
-
-        for (i = 0; i < device->context_count; ++i)
-            device->contexts[i]->constant_update_mask |= WINED3D_SHADER_CONST_VS_F;
-    }
     device->softwareVertexProcessing = software;
 }
 

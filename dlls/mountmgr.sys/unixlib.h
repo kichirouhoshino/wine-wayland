@@ -90,7 +90,6 @@ struct set_dosdev_symlink_params
 {
     const char *dev;
     const char *dest;
-    BOOL serial;
 };
 
 struct get_volume_dos_devices_params
@@ -104,13 +103,6 @@ struct read_volume_file_params
     const char *volume;
     const char *file;
     void *buffer;
-    ULONG *size;
-};
-
-struct get_volume_filesystem_params
-{
-    const char *volume;
-    void *fstypename;
     ULONG *size;
 };
 
@@ -180,7 +172,6 @@ enum mountmgr_funcs
     unix_write_credential,
     unix_delete_credential,
     unix_enumerate_credentials,
-    unix_get_volume_filesystem,
 };
 
 #define MOUNTMGR_CALL( func, params ) WINE_UNIX_CALL( unix_ ## func, params )

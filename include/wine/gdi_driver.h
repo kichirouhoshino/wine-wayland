@@ -312,7 +312,6 @@ struct user_driver_funcs
     NTSTATUS (*pMsgWaitForMultipleObjectsEx)(DWORD,const HANDLE*,const LARGE_INTEGER*,DWORD,DWORD);
     void    (*pReleaseDC)(HWND,HDC);
     BOOL    (*pScrollDC)(HDC,INT,INT,HRGN);
-    void    (*pSetActiveWindow)(HWND);
     void    (*pSetCapture)(HWND,UINT);
     void    (*pSetFocus)(HWND);
     void    (*pSetLayeredWindowAttributes)(HWND,COLORREF,BYTE,DWORD);
@@ -335,8 +334,6 @@ struct user_driver_funcs
     const struct vulkan_funcs * (*pwine_get_vulkan_driver)(UINT);
     /* opengl support */
     struct opengl_funcs * (*pwine_get_wgl_driver)(UINT);
-    /* IME functions */
-    void    (*pUpdateCandidatePos)(HWND, const RECT *);
     /* thread management */
     void    (*pThreadDetach)(void);
 };

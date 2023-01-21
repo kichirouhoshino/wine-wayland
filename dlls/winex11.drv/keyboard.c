@@ -1134,7 +1134,6 @@ static WORD EVENT_event_to_vkey( XIC xic, XKeyEvent *e)
  */
 static void X11DRV_send_keyboard_input( HWND hwnd, WORD vkey, WORD scan, UINT flags, UINT time )
 {
-    RAWINPUT rawinput;
     INPUT input;
 
     TRACE_(key)( "hwnd %p vkey=%04x scan=%04x flags=%04x\n", hwnd, vkey, scan, flags );
@@ -1146,7 +1145,7 @@ static void X11DRV_send_keyboard_input( HWND hwnd, WORD vkey, WORD scan, UINT fl
     input.u.ki.time        = time;
     input.u.ki.dwExtraInfo = 0;
 
-    __wine_send_input( hwnd, &input, &rawinput );
+    __wine_send_input( hwnd, &input, NULL );
 }
 
 
@@ -1881,24 +1880,13 @@ BOOL X11DRV_MappingNotify( HWND dummy, XEvent *event )
 {
     HWND hwnd;
 
-    switch (event->xmapping.request)
-    {
-    case MappingModifier:
-    case MappingKeyboard:
-        XRefreshKeyboardMapping( &event->xmapping );
-        X11DRV_InitKeyboard( event->xmapping.display );
+    XRefreshKeyboardMapping(&event->xmapping);
+    X11DRV_InitKeyboard( event->xmapping.display );
 
-        hwnd = get_focus();
-        if (!hwnd) hwnd = get_active_window();
-        NtUserPostMessage( hwnd, WM_INPUTLANGCHANGEREQUEST,
-                           0 /*FIXME*/, (LPARAM)NtUserGetKeyboardLayout(0) );
-        break;
-
-    case MappingPointer:
-        X11DRV_InitMouse( event->xmapping.display );
-        break;
-    }
-
+    hwnd = get_focus();
+    if (!hwnd) hwnd = get_active_window();
+    NtUserPostMessage( hwnd, WM_INPUTLANGCHANGEREQUEST,
+                       0 /*FIXME*/, (LPARAM)NtUserGetKeyboardLayout(0) );
     return TRUE;
 }
 

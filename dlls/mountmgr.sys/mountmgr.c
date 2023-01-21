@@ -46,21 +46,14 @@ struct mount_point
 static struct list mount_points_list = LIST_INIT(mount_points_list);
 static HKEY mount_key;
 
-void set_mount_point_id( struct mount_point *mount, const void *id, unsigned int id_len, int drive )
+void set_mount_point_id( struct mount_point *mount, const void *id, unsigned int id_len )
 {
-    WCHAR logicalW[] = {'\\','\\','.','\\','a',':',0};
     free( mount->id );
     mount->id_len = max( MIN_ID_LEN, id_len );
     if ((mount->id = calloc( mount->id_len, 1 )))
     {
         memcpy( mount->id, id, id_len );
-        if (drive < 0)
-            RegSetValueExW( mount_key, mount->link.Buffer, 0, REG_BINARY, mount->id, mount->id_len );
-        else
-        {
-            logicalW[4] = 'a' + drive;
-            RegSetValueExW( mount_key, mount->link.Buffer, 0, REG_BINARY, (BYTE*)logicalW, sizeof(logicalW) );
-        }
+        RegSetValueExW( mount_key, mount->link.Buffer, 0, REG_BINARY, mount->id, mount->id_len );
     }
     else mount->id_len = 0;
 }
