@@ -194,6 +194,7 @@ static void test_EnumProcessModules(void)
 static void test_GetModuleInformation(void)
 {
     HMODULE hMod = GetModuleHandleA(NULL);
+    DWORD *tmp, counter = 0;
     MODULEINFO info;
     DWORD ret;
 
@@ -213,10 +214,21 @@ static void test_GetModuleInformation(void)
     GetModuleInformation(hpQV, hMod, &info, sizeof(info)-1);
     ok(GetLastError() == ERROR_INSUFFICIENT_BUFFER, "expected error=ERROR_INSUFFICIENT_BUFFER but got %ld\n", GetLastError());
 
-    SetLastError(0xdeadbeef);
     ret = GetModuleInformation(hpQV, hMod, &info, sizeof(info));
     ok(ret == 1, "failed with %ld\n", GetLastError());
     ok(info.lpBaseOfDll == hMod, "lpBaseOfDll=%p hMod=%p\n", info.lpBaseOfDll, hMod);
+
+    hMod = LoadLibraryA("shell32.dll");
+    ok(hMod != NULL, "Failed to load shell32.dll, error: %lu\n", GetLastError());
+
+    ret = GetModuleInformation(hpQV, hMod, &info, sizeof(info));
+    ok(ret == 1, "failed with %lu\n", GetLastError());
+    info.SizeOfImage /= sizeof(DWORD);
+    for (tmp = (DWORD *)hMod; info.SizeOfImage; info.SizeOfImage--)
+        counter ^= *tmp++;
+    trace("xor of shell32: %08lx\n", counter);
+
+    FreeLibrary(hMod);
 }
 
 static BOOL check_with_margin(SIZE_T perf, SIZE_T sysperf, int margin)
@@ -821,6 +833,9 @@ static void test_QueryWorkingSetEx(void)
     check_QueryWorkingSetEx(addr, "exe,readonly1", 0, 0, 1, TRUE);
 
     *(volatile char *)addr;
+    check_QueryWorkingSetEx(addr, "exe,readonly2", 1, PAGE_READONLY, 1, FALSE);
+
+    ret = VirtualProtect(addr, 0x1000, PAGE_EXECUTE_READWRITE, &prot);
     ok(ret, "VirtualProtect failed with %ld\n", GetLastError());
     check_QueryWorkingSetEx(addr, "exe,readonly2", 1, PAGE_READONLY, 1, FALSE);
 

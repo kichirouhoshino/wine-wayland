@@ -317,6 +317,9 @@ static INT CDECL X11DRV_ExtEscape( PHYSDEV dev, INT escape, INT in_count, LPCVOI
                     return TRUE;
                 }
                 break;
+            case X11DRV_FLUSH_GDI_DISPLAY:
+                XFlush( gdi_display );
+                return TRUE;
             default:
                 break;
             }
@@ -416,6 +419,7 @@ static const struct user_driver_funcs x11drv_funcs =
     .pMsgWaitForMultipleObjectsEx = X11DRV_MsgWaitForMultipleObjectsEx,
     .pReleaseDC = X11DRV_ReleaseDC,
     .pScrollDC = X11DRV_ScrollDC,
+    .pSetActiveWindow = X11DRV_SetActiveWindow,
     .pSetCapture = X11DRV_SetCapture,
     .pSetFocus = X11DRV_SetFocus,
     .pSetLayeredWindowAttributes = X11DRV_SetLayeredWindowAttributes,
@@ -435,6 +439,7 @@ static const struct user_driver_funcs x11drv_funcs =
     .pSystemParametersInfo = X11DRV_SystemParametersInfo,
     .pwine_get_vulkan_driver = X11DRV_wine_get_vulkan_driver,
     .pwine_get_wgl_driver = X11DRV_wine_get_wgl_driver,
+    .pUpdateCandidatePos = X11DRV_UpdateCandidatePos,
     .pThreadDetach = X11DRV_ThreadDetach,
 };
 

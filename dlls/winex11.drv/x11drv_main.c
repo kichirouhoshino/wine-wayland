@@ -157,6 +157,7 @@ static const char * const atom_names[NB_XATOMS - FIRST_XATOM] =
     "_ICC_PROFILE",
     "_KDE_NET_WM_STATE_SKIP_SWITCHER",
     "_MOTIF_WM_HINTS",
+    "_NET_ACTIVE_WINDOW",
     "_NET_STARTUP_INFO_BEGIN",
     "_NET_STARTUP_INFO",
     "_NET_SUPPORTED",
@@ -706,12 +707,13 @@ static NTSTATUS x11drv_init( void *arg )
 #ifdef SONAME_LIBXCOMPOSITE
     X11DRV_XComposite_Init();
 #endif
-    X11DRV_XInput2_Init();
+    x11drv_xinput_load();
 
 #ifdef HAVE_XKB
     if (use_xkb) use_xkb = XkbUseExtension( gdi_display, NULL, NULL );
 #endif
     X11DRV_InitKeyboard( gdi_display );
+    X11DRV_InitMouse( gdi_display );
     if (use_xim) use_xim = X11DRV_InitXIM( input_style );
 
     init_user_driver();
@@ -731,6 +733,8 @@ void X11DRV_ThreadDetach(void)
     if (data)
     {
         vulkan_thread_detach();
+        if (NtUserGetWindowThread( NtUserGetDesktopWindow(), NULL ) == GetCurrentThreadId())
+            x11drv_xinput_disable( data->display, DefaultRootWindow( data->display ), PointerMotionMask );
         if (data->xim) XCloseIM( data->xim );
         if (data->font_set) XFreeFontSet( data->display, data->font_set );
         XCloseDisplay( data->display );
@@ -800,6 +804,10 @@ struct x11drv_thread_data *x11drv_init_thread_data(void)
     NtUserGetThreadInfo()->driver_data = (UINT_PTR)data;
 
     if (use_xim) X11DRV_SetupXIM();
+
+    x11drv_xinput_init();
+    if (NtUserGetWindowThread( NtUserGetDesktopWindow(), NULL ) == GetCurrentThreadId())
+        x11drv_xinput_enable( data->display, DefaultRootWindow( data->display ), PointerMotionMask );
 
     return data;
 }

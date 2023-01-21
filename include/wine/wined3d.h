@@ -1324,6 +1324,7 @@ enum wined3d_memory_segment_group
 #define WINED3D_LEGACY_CUBEMAP_FILTERING                        0x00001000
 #define WINED3D_NORMALIZED_DEPTH_BIAS                           0x00002000
 #define WINED3D_NO_DRAW_INDIRECT                                0x00004000
+#define WINED3D_LEGACY_SHADER_CONSTANTS                         0x00008000
 
 #define WINED3D_RESZ_CODE                                       0x7fa05000
 
@@ -1590,6 +1591,7 @@ enum wined3d_memory_segment_group
 #define WINED3D_MAX_CONSTS_B                                    16
 #define WINED3D_MAX_CONSTS_I                                    16
 #define WINED3D_MAX_VS_CONSTS_F                                 256
+#define WINED3D_MAX_VS_CONSTS_F_SWVP                            8192
 #define WINED3D_MAX_PS_CONSTS_F                                 224
 #define WINED3D_MAX_RENDER_TARGETS                              8
 #define WINED3D_MAX_CONSTANT_BUFFER_SIZE                        4096
@@ -2160,7 +2162,7 @@ struct wined3d_stateblock_state
     int base_vertex_index;
 
     struct wined3d_shader *vs;
-    struct wined3d_vec4 vs_consts_f[WINED3D_MAX_VS_CONSTS_F];
+    struct wined3d_vec4 vs_consts_f[WINED3D_MAX_VS_CONSTS_F_SWVP];
     struct wined3d_ivec4 vs_consts_i[WINED3D_MAX_CONSTS_I];
     BOOL vs_consts_b[WINED3D_MAX_CONSTS_B];
 
